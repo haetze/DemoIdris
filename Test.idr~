@@ -1,0 +1,21 @@
+module Test 
+
+
+data Wrap : (x : a) -> Type where
+  Wrapper : (x : a) -> Wrap x
+
+
+data Vec : a -> Nat -> Type where
+  Cons : a -> Vec a x -> Vec a (S x)
+  Nil : Vec a 0
+  
+rep : a -> (x : Nat) -> Vec a x
+rep _ Z = Nil
+rep x (S n) = Cons x (rep x n)
+
+l : {n:Nat} -> Vec a n -> Wrap n
+l {n=Z} _ = Wrapper Z
+l {n=S k} _ = Wrapper (S k)
+
+ll : (n:Nat) -> Wrap n
+ll n = l $ rep 'a' n
