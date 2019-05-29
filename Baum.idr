@@ -29,9 +29,7 @@ plus_4 n m = let r = pSRSucc n m
                  s = plus_3 m in rewrite s in r 
 
 plus_2 : (n:Nat) -> (m:Nat) -> (n + (m + 1)) = S (plus n m)
-plus_2 n m = let i = plusAssociative n m (S Z) 
-                 j = pSRSucc n m 
-                 k = plus_4 n m in sym k 
+plus_2 n m = let k = plus_4 n m in sym k 
 
 data Tree : (a : Type) -> (s : Nat) -> Type where
   Empty : Tree a 0
@@ -57,7 +55,7 @@ preorder (Fork l x r) = let l' = preorder l
                             
                             
 prf2 : Vect (plus n (plus m (S Z))) a -> Vect (S (plus n m)) a
-prf2 {n} {m} t = rewrite sym (plus_2 n m) in t
+prf2 {n} {m} t = rewrite plus_4 n m in t
 
 
 
@@ -67,7 +65,6 @@ postorder (Fork l x r) = let l' = postorder l
                              r' = postorder r
                              result = l' ++ (r' ++ [x]) in 
                              prf2 result
-
 
 
 
