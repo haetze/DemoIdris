@@ -39,7 +39,36 @@ statement_1 x (y :: ys@(y' :: ys')) = case eqSt x y of
                                         in case r of 
                                              Left p => Left (C x y p)
                                              Right () => Right ()
-                                             
+
+data ContainAllElems : (v : Vect n a) -> (u : Vect m a) -> Type where
+  Introduce : (u : Vect n a) -> ContainAllElems [] u
+  Add : (x : a) -> ContainAllElems v u -> Contains x u -> ContainAllElems (x :: v) u
+
+stmt' : (v : Vect n Nat) -> (u : Vect (S m) Nat) -> Either (ContainAllElems v u) ()
+stmt' [] ys = Left (Introduce ys)
+stmt' (x :: xs) u = let r = statement_1 x u 
+                        s = stmt' xs u in
+                    case r of 
+                    Left p => case s of 
+                              Right () => Right ()
+                              Left q => Left (Add x q p)
+                    Right () => Right ()
+
+
+
+stmt : (v : Vect n Nat) -> (u : Vect n Nat) -> Either (ContainAllElems v u
+                                                      ,ContainAllElems u v) ()
+stmt [] [] = Left (Introduce [], Introduce [])
+stmt (h::t) (h'::t') = let r = stmt' (h::t) (h'::t') 
+                           s = stmt' (h'::t') (h::t)  in 
+                       case r of 
+                       Right _ => Right ()
+                       Left p  => case s of 
+                                  Right _ => Right ()
+                                  Left q  => Left (p, q)
+
+
+
 statement : (v : Vect n Nat) -> (u : Vect n Nat) -> Bool
 statement [] [] = True
 statement (x :: xs) u = case statement_1 x u of 
