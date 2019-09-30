@@ -47,3 +47,34 @@ del x (y :: xs) = let
 
 test_v : Vect 5 Nat
 test_v = [1,2,3,4,5]
+
+data NotEQNat : Nat -> Nat -> Type where
+  BaseZS : NotEQNat Z (S n)
+  BaseSZ : NotEQNat (S n) Z
+  Step   : NotEQNat n m -> NotEQNat (S n) (S m)
+  
+data Without : (x : Nat) -> (v : Vect n Nat) -> Type where
+  BaseWN : Without x []
+  StepWN : (y : Nat) -> NotEQNat x y -> Without x v -> Without x (y :: v)
+  
+||| Proof that
+||| \forall n,m \in Nat. n =/= m /\ n = m
+stmt_5 : Either (NotEQNat n m) (n = m)
+stmt_5 {n = Z} {m = Z} = Right Refl
+stmt_5 {n = S k} {m = Z} = Left BaseSZ
+stmt_5 {n = Z} {m = S l} = Left BaseZS
+stmt_5 {n = S k} {m = S l} = case stmt_5 {n = k} {m = l} of
+                                  Left p => Left (Step p)
+                                  Right p => rewrite p in Right Refl
+
+del' : (x : Nat) -> (v : Vect n Nat) -> (m : Nat ** u : Vect m Nat ** (LTQ m n, Without x u))
+del' x [] = (Z ** [] ** (Base, BaseWN))
+del' x (y :: xs) = let (k ** u ** (p, q)) = del' x xs
+                   in
+                      case stmt_5 {n = x} {m = y} of 
+                        Left p' => (S k ** y :: u ** (Ind p, StepWN y p' q))
+                        Right p' => (k ** u ** (stmt_4 p, q)) 
+
+test : (m ** Vect m Nat)
+test = let (m ** v ** (_,_)) = del' 2 test_v in (m ** v)
+
