@@ -56,7 +56,14 @@ data NotEQNat : Nat -> Nat -> Type where
 data Without : (x : Nat) -> (v : Vect n Nat) -> Type where
   BaseWN : Without x []
   StepWN : (y : Nat) -> NotEQNat x y -> Without x v -> Without x (y :: v)
-  
+
+||| Proof that
+||| \forall (xs without x) (ys without x). (xs ++ ys without x)
+stmt_6 : Without x xs -> Without x ys -> Without x (xs ++ ys)
+stmt_6 BaseWN q = q
+stmt_6 (StepWN y z w) q = let rec = stmt_6 w q
+                          in StepWN y z rec
+    
 ||| Proof that
 ||| \forall n,m \in Nat. n =/= m /\ n = m
 stmt_5 : Either (NotEQNat n m) (n = m)
