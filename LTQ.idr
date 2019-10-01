@@ -52,7 +52,26 @@ data NotEQNat : Nat -> Nat -> Type where
   BaseZS : NotEQNat Z (S n)
   BaseSZ : NotEQNat (S n) Z
   Step   : NotEQNat n m -> NotEQNat (S n) (S m)
-  
+
+pred : (n : Nat) -> Nat
+pred Z = Z
+pred (S n) = n
+
+stmt_8 : S k = S l -> k = l
+stmt_8 p = cong {f = LTQ.pred} p
+
+||| Proof that
+||| \forall n, m. n = m /\ n=/=m => Void
+stmt_7 : n = m -> NotEQNat n m -> Void
+stmt_7 {n = Z} Refl BaseZS impossible
+stmt_7 {n = Z} Refl BaseSZ impossible
+stmt_7 {n = Z} Refl (Step _) impossible
+stmt_7 {m = Z} Refl BaseZS impossible
+stmt_7 {m = Z} Refl BaseSZ impossible
+stmt_7 {m = Z} Refl (Step _) impossible
+stmt_7 {m = S k} {n = S l} p (Step x) = stmt_7 (stmt_8 p) x 
+ 
+    
 data Without : (x : Nat) -> (v : Vect n Nat) -> Type where
   BaseWN : Without x []
   StepWN : (y : Nat) -> NotEQNat x y -> Without x v -> Without x (y :: v)
