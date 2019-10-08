@@ -71,5 +71,45 @@ stmt_2 {m = Z} EvenZeroP (S _) Refl impossible
 stmt_2 (EvenStepP _) Z Refl impossible
 stmt_2 (EvenStepP x) (S k) p = let rec = stmt_2 x k (stmt_12 p) in rec
                    
-                   
-                               
+plus_Z : plus n Z = n
+plus_Z {n = Z} = Refl
+plus_Z {n = S k} = let r = plus_Z {n = k} 
+                   in cong r
+
+distr : S n = S (m + m) -> S n = m + S m
+distr {m} p = rewrite sym (stmt_1 {n = m} {m = m}) in p
+
+                                                         
+add_two : n = m + m -> S (S n) = S m + S m
+add_two {m} p = let r = cong {f = S} p
+                    s = distr r 
+                    t = cong {f = S} s
+            in t
+
+lem_3 : S (S Z) * n = n + n
+lem_3 {n} = rewrite sym (plus_Z {n = n}) in Refl
+
+lem_4 : (\x1 => n = (S (S Z)) * x1) x -> (\x1 => n = x1 + x1) x
+lem_4 {x} p = rewrite sym (lem_3 {n = x}) in p
+
+lem_2 : (x ** n = (S (S Z)) * x) -> (x ** n = x + x)                                      
+lem_2 (x ** p) = let q = lem_4 p
+                 in (x ** q)
+
+
+lem_6 : plus y y = plus y (plus y Z)
+lem_6 {y} = rewrite plus_Z {n = y} in Refl
+
+lem_7 : S (S n) = m + m -> S (S n) = m + (plus m Z)
+lem_7 {m} p = rewrite sym (lem_6 {y = m}) in p
+                                                                                             
+||| Proof that
+||| \forall n. n is even => \exists x. n = 2 * x
+even_mult_2 : Even n -> (x ** n = S (S Z) * x)
+even_mult_2 EvenZeroP = (0 ** Refl)
+even_mult_2 (EvenStepP x) = let r = even_mult_2 x
+                                (y ** p)  = lem_2 r
+                                q = add_two p
+                                w = lem_7 q
+                            in (S y ** w)
+ 
