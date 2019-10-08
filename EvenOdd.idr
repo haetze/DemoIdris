@@ -113,3 +113,14 @@ even_mult_2 (EvenStepP x) = let r = even_mult_2 x
                                 w = lem_7 q
                             in (S y ** w)
  
+even_or_odd : Even n -> Odd n -> Void
+even_or_odd EvenZeroP OddOnesP impossible
+even_or_odd EvenZeroP (OddStepP _) impossible
+even_or_odd (EvenStepP x) (OddStepP y) = let r = even_or_odd x y in r
+
+
+zeroE : Even 0
+zeroE = EvenZeroP
+
+sixteenE : Even 16
+sixteenE = EvenStepP (EvenStepP (EvenStepP (EvenStepP (EvenStepP (EvenStepP (EvenStepP (EvenStepP EvenZeroP)))))))
