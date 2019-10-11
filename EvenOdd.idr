@@ -18,7 +18,26 @@ number_odd_or_even (S Z) = Right OddOnesP
 number_odd_or_even (S (S n)) = case number_odd_or_even n of
                                     Left p => Left (EvenStepP p)
                                     Right p => Right (OddStepP p) 
-                               
+
+odd_follows_even : Even n -> Odd (S n)
+odd_follows_even EvenZeroP = OddOnesP
+odd_follows_even (EvenStepP x) = let r = odd_follows_even x 
+                                 in (OddStepP r)
+
+even_follows_odd : Odd n -> Even (S n)
+even_follows_odd OddOnesP = EvenStepP EvenZeroP
+even_follows_odd (OddStepP x) = EvenStepP (even_follows_odd x)                                                                  
+
+even_preds_odd : Odd (S n) -> Even n
+even_preds_odd OddOnesP = EvenZeroP
+even_preds_odd (OddStepP OddOnesP)  = EvenStepP EvenZeroP
+even_preds_odd (OddStepP (OddStepP x))  = EvenStepP (even_preds_odd (OddStepP x))
+
+
+odd_preds_even : Even (S (S n)) -> Odd (S n)
+odd_preds_even (EvenStepP EvenZeroP) = OddOnesP
+odd_preds_even (EvenStepP (EvenStepP x)) = OddStepP (odd_preds_even (EvenStepP x))
+
 ||| Proof that
 ||| \forall n, m \in N. S (n + m) = n + (S m)
 stmt_1 :                S (n + m) = n + (S m)
