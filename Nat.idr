@@ -28,3 +28,7 @@ stmt_4 (S k) right = rewrite stmt_5 {n = right} {m = k} in cong (stmt_4 k right)
 stmt_6 : (x : Nat) -> (y : Nat) -> add x y = x + y
 stmt_6 Z y = Refl
 stmt_6 (S k) y = cong (stmt_6 k y)
+
+stmt_7 : (x : Nat) -> (y : Nat) -> (z : Nat) -> (x + y) + z = x + (y + z)
+stmt_7 Z y z = Refl
+stmt_7 (S k) y z = let r = stmt_7 k y z in cong r 
