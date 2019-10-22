@@ -71,6 +71,12 @@ stmt_1 : (xs : List a) -> IsRevOf ys xs -> ys = m_rev xs
 stmt_1 [] EmptyRev = Refl
 stmt_1 (x :: xs) (ConsRev x y) = let r = stmt_1 xs y in cong {f = \l => app l [x]} r
 
+stmt_2 : (ys:List a) -> IsRevOf ys xs -> xs = m_rev ys
+stmt_2 [] EmptyRev = Refl
+stmt_2 (app zs [x]) (ConsRev x l) = let r = stmt_2 zs l 
+                                        s = cong {f = \l => x :: l} r
+                                    in rewrite sym (append_rev x zs) in s 
+
 rev_un : (xs : List a) -> (p: IsRevOf ys xs) -> (q : IsRevOf zs xs) -> zs = ys
 rev_un [] EmptyRev EmptyRev = Refl
 rev_un (_ :: _) (ConsRev _ _) EmptyRev impossible
@@ -113,4 +119,17 @@ revs_inv {xs} {ys} p = let q = help' p
                            result = rev_un xs v p 
                        in result
 
+rewri_rev : IsRevOf a b -> a = c -> IsRevOf c b
+rewri_rev p q = rewrite sym q in p
 
+rewri_rev' : IsRevOf a b -> b = c -> IsRevOf a c
+rewri_rev' p q = rewrite sym q in p
+
+rev_inv' : IsRevOf ys xs -> xs = m_rev (m_rev xs)
+rev_inv' {xs} {ys} p = let (ys' ** p') = rev' xs
+                           s = stmt_1 xs p'
+                           u = stmt_2 ys' p' 
+                       in rewrite sym s in u
+ 
+rev_rev : (xs : List a) -> xs = m_rev (m_rev xs)
+rev_rev xs = let (_ ** p) = rev' xs in rev_inv' p
