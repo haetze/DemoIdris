@@ -103,8 +103,8 @@ help''' : IsRevOf (m_rev xs) xs
        -> IsRevOf (m_rev (m_rev ys)) xs
 help''' p q = rewrite sym q in p        
 
-revs_rev : IsRevOf ys xs -> ys = m_rev (m_rev ys) 
-revs_rev {xs} {ys} p = let q = help' p
+revs_inv : IsRevOf ys xs -> ys = m_rev (m_rev ys) 
+revs_inv {xs} {ys} p = let q = help' p
                            r = help' q
                            s = m_rev_Rev xs 
                            u = help' s
@@ -114,18 +114,3 @@ revs_rev {xs} {ys} p = let q = help' p
                        in result
 
 
-rev_revs : IsRevOf ys xs -> IsRevOf xs ys
-rev_revs {xs} {ys} p = let q = revs_rev p 
-                           r = help' p
-                           
-                       in ?p
-
-rev_inv : (xs : List a) 
-       -> IsRevOf xs ys 
-       -> xs = m_rev (m_rev xs)
-rev_inv xs p = let e = revs_rev p
-               in e
-
-rev_inv' : (xs : List a) -> a
-rev_inv' xs = let r = rev_inv (m_rev xs) (m_rev_Rev xs) 
-             in ?k
