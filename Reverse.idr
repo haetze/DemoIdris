@@ -133,3 +133,10 @@ rev_inv' {xs} {ys} p = let (ys' ** p') = rev' xs
  
 rev_rev : (xs : List a) -> xs = m_rev (m_rev xs)
 rev_rev xs = let (_ ** p) = rev' xs in rev_inv' p
+
+rewri_inner : IsRevOf a (m_rev xs) 
+           -> m_rev ys = xs 
+           -> IsRevOf a (m_rev (m_rev ys))
+rewri_inner p q = rewrite q in p
+
+
