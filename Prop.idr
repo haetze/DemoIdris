@@ -4,6 +4,11 @@ module Prop
 conc : (b -> c) -> (a -> b) -> a -> c
 conc g f a = g (f a)
 
+conc_eq_dot : (g : b -> c)
+           -> (f : a -> b)
+           -> (x : a)
+           -> conc g f x = (g . f) x
+conc_eq_dot g f x = Refl           
 
 conc_assoc : (h : c -> d) 
           -> (g : b -> c) 
@@ -32,7 +37,10 @@ map_id_neutr : (l : List a) -> mapL Prelude.Basics.id l = l
 map_id_neutr [] = Refl
 map_id_neutr (x :: xs) = cong {f = addHead x} (map_id_neutr xs) 
 
-map_conc : (f : a -> b) -> (g : b -> c) -> (l : List a) -> mapL g (mapL f l) = mapL (conc g f) l
+map_conc : (f : a -> b) 
+        -> (g : b -> c) 
+        -> (l : List a) 
+        -> mapL g (mapL f l) = mapL (conc g f) l
 map_conc f g [] = Refl
 map_conc f g (x :: xs) = cong {f = addHead (g (f x))} (map_conc f g xs)
 
