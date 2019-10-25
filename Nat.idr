@@ -32,3 +32,15 @@ stmt_6 (S k) y = cong (stmt_6 k y)
 stmt_7 : (x : Nat) -> (y : Nat) -> (z : Nat) -> (x + y) + z = x + (y + z)
 stmt_7 Z y z = Refl
 stmt_7 (S k) y z = let r = stmt_7 k y z in cong r 
+
+total mult_c : (left : Nat) -> (right : Nat) ->
+               left * right = right * left
+mult_c Z right        = rewrite multZeroRightZero right in Refl
+mult_c (S left) right =
+       let inductiveHypothesis = multCommutative left right 
+           mult_r_s_p = multRightSuccPlus right left in 
+         rewrite inductiveHypothesis in
+         rewrite mult_r_s_p in
+         Refl
+
+
