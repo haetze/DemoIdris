@@ -48,6 +48,17 @@ del x (y :: xs) = let
 test_v : Vect 5 Nat
 test_v = [1,2,3,4,5]
 
+calc_dif : (x : Nat) -> 
+           (y : Nat) -> 
+           (p : LTQ x y) -> 
+           (dif ** dif + x = y)
+calc_dif Z y Base = (y ** rewrite plusZeroRightNeutral y in Refl)
+calc_dif (S n) (S m) (Ind p) = let (d' ** p') = calc_dif n m p
+                                   q = cong {f = S} p'
+                               in (d' ** rewrite sym (plusSuccRightSucc d' n) in q)
+           
+
+
 data NotEQNat : Nat -> Nat -> Type where
   BaseZS : NotEQNat Z (S n)
   BaseSZ : NotEQNat (S n) Z
@@ -103,4 +114,5 @@ del' x (y :: xs) = let (k ** u ** (p, q)) = del' x xs
 
 test : (m ** Vect m Nat)
 test = let (m ** v ** (_,_)) = del' 2 test_v in (m ** v)
+
 
