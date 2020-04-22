@@ -58,11 +58,13 @@ rew p q = rewrite sym p in q
 sort : Ord a => Vect n a -> Vect n a
 sort [] = []
 sort (x::xs) = let (m ** m' ** v ** v' ** p) = Sort2.split xs x
-                   vs = Sort2.sort v
-                   vs'= Sort2.sort v'
+                   vs = Sort2.sort (assert_smaller (x::xs) v)
+                   vs'= Sort2.sort (assert_smaller (x::xs) v')
                    res= vs ++ [x] ++ vs'
                    prf= q m m'
                    pr' = rew {m} {m'} p prf
                in rewrite sym pr' in res
  
+
+
  

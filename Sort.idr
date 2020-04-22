@@ -131,9 +131,6 @@ sort (x :: xs) = case sort xs of
                                      Left l@(Cons h' t' q) => Cons Z l (Zero h') 
                                      Right l@(Cons h' t' q) => Cons Z l (Zero h') 
 
-p : (v : Vect n Nat) -> ContainAllElems (toVect (sort v)) (Z::v)
-p [] = Add 0 (Introduce [0]) (B 0 [])
-p (y :: ys) = let r = p ys in ?h
               
 
  
