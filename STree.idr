@@ -76,4 +76,68 @@ fromMax2 : (x : Nat) -> (y : Nat) -> y = mmax x y -> STE x y
 fromMax2 Z y p = E2Z y
 fromMax2 (S _) Z Refl impossible
 fromMax2 (S k) (S j) p = Stp (fromMax2 k j (mmax_trans j k j p))                 
-                                                
+
+total 
+minFromP : (a : Nat) -> (b : Nat) -> STE a b -> a = (mmin a b)
+minFromP Z b p = Refl
+minFromP (S _) Z (E2Z _) impossible
+minFromP (S _) Z (Stp _) impossible
+minFromP (S k) (S j) (Stp x) = cong {f = S} (minFromP k j x)
+
+minFromP' : STE a b -> a = (mmin a b)
+minFromP' {a} {b} p = minFromP a b p
+
+total
+maxFromP : (a : Nat) -> (b : Nat) -> STE a b -> b = (mmax a b)
+maxFromP Z b p = Refl
+maxFromP (S _) Z (E2Z _) impossible
+maxFromP (S _) Z (Stp _) impossible
+maxFromP (S k) (S j) (Stp x) = cong {f = S} (maxFromP k j x)
+
+maxFromP' : STE a b -> b = (mmax a b)
+maxFromP' {a} {b} p = maxFromP a b p
+                                                                                                        
+total
+minKom : (a : Nat) -> (b : Nat) -> mmin a b = mmin b a
+minKom Z Z = Refl
+minKom Z (S k) = Refl
+minKom (S k) Z = Refl
+minKom (S k) (S j) = cong (minKom k j)
+
+total 
+maxKom : (a : Nat) -> (b : Nat) -> mmax a b = mmax b a
+maxKom Z Z = Refl
+maxKom Z (S k) = Refl
+maxKom (S k) Z = Refl
+maxKom (S k) (S j) = cong (maxKom k j)
+
+data STree : Nat -> Nat -> Type where
+  Empt : STree a a
+  Fork : STree a b -> 
+         STree c d -> 
+         (e : Nat) -> 
+         STE b e -> 
+         STE e c ->
+         STE a b ->
+         STE c d -> STree a d
+
+
+-- insert : STree a b -> (e : Nat) -> STree (mmin a e) (mmax b e)
+-- insert {a} Empt e = case order a e of
+--                          Left p => rewrite sym (maxFromP a e p) 
+--                                 in rewrite sym (minFromP a e p) 
+--                                 in (Fork Empt Empt e p (refl e) (refl a) (refl e))
+--                          Right p => let q = minFromP e a p
+--                                         s = maxFromP e a p
+--                                         t = maxKom a e
+--                                         r = minKom a e in 
+--                                         rewrite r in 
+--                                         rewrite t in
+--                                         rewrite sym q in 
+--                                         rewrite sym s in (Fork Empt Empt e (refl e) p (refl e) (refl a))
+-- insert {a} {b} (Fork x y k z w f g ) e = case order k e of
+--                                          Left p => let new_right = insert y e 
+--                                                        q = minFromP' f
+--                                                    in rewrite q 
+--                                                    in Fork x new_right k ?h ?i ?a ?b
+--                                          Right p => ?g
