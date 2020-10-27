@@ -121,23 +121,64 @@ data STree : Nat -> Nat -> Type where
          STE a b ->
          STE c d -> STree a d
 
+two_to_min : STE a b -> STE a c -> STE a (mmin b c)
+two_to_min {a = Z} {b = b} {c = c} p q = E2Z (mmin b c)
+two_to_min {a = (S _)} {b = Z} {c = Z} (E2Z _) _ impossible
+two_to_min {a = (S _)} {b = Z} {c = Z} (Stp _) _ impossible
+two_to_min {a = (S _)} {b = Z} {c = (S _)} (E2Z _) _ impossible
+two_to_min {a = (S _)} {b = Z} {c = (S _)} (Stp _) _ impossible
+two_to_min {a = (S _)} {b = (S _)} {c = Z} _ (E2Z _) impossible
+two_to_min {a = (S _)} {b = (S _)} {c = Z} _ (Stp _) impossible
+two_to_min {a = (S k)} {b = (S j)} {c = (S i)} (Stp x) (Stp y) = Stp (two_to_min x y)
+ 
+two_to_max : STE a b -> STE c b -> STE (mmax a c) b
+two_to_max {a = Z} {b = b} {c = c} p q = q
+two_to_max {a = (S _)} {b = Z} {c = Z} (E2Z _) _ impossible
+two_to_max {a = (S _)} {b = Z} {c = Z} (Stp _) _ impossible
+two_to_max {a = (S _)} {b = Z} {c = (S _)} (E2Z _) _ impossible
+two_to_max {a = (S _)} {b = Z} {c = (S _)} (Stp _) _ impossible
+two_to_max {a = (S k)} {b = (S j)} {c = Z} p q = p
+two_to_max {a = (S k)} {b = (S j)} {c = (S i)} (Stp x) (Stp y) = Stp (two_to_max x y)
+ 
 
--- insert : STree a b -> (e : Nat) -> STree (mmin a e) (mmax b e)
--- insert {a} Empt e = case order a e of
---                          Left p => rewrite sym (maxFromP a e p) 
---                                 in rewrite sym (minFromP a e p) 
---                                 in (Fork Empt Empt e p (refl e) (refl a) (refl e))
---                          Right p => let q = minFromP e a p
---                                         s = maxFromP e a p
---                                         t = maxKom a e
---                                         r = minKom a e in 
---                                         rewrite r in 
---                                         rewrite t in
---                                         rewrite sym q in 
---                                         rewrite sym s in (Fork Empt Empt e (refl e) p (refl e) (refl a))
--- insert {a} {b} (Fork x y k z w f g ) e = case order k e of
---                                          Left p => let new_right = insert y e 
---                                                        q = minFromP' f
---                                                    in rewrite q 
---                                                    in Fork x new_right k ?h ?i ?a ?b
---                                          Right p => ?g
+insert : STree a b -> (e : Nat) -> STree (mmin a e) (mmax b e)
+insert {a} Empt e = case order a e of
+                         Left p => rewrite sym (maxFromP a e p) 
+                                in rewrite sym (minFromP a e p) 
+                                in (Fork Empt Empt e p (refl e) (refl a) (refl e))
+                         Right p => let q = minFromP e a p
+                                        s = maxFromP e a p
+                                        t = maxKom a e
+                                        r = minKom a e in 
+                                        rewrite r in 
+                                        rewrite t in
+                                        rewrite sym q in 
+                                        rewrite sym s in (Fork Empt Empt e (refl e) p (refl e) (refl a))
+insert {a} {b} (Fork x y k z w f g ) e = case order k e of
+                                         Left p => let (Fork o u i d s t r) = insert y e 
+                                                       q = minFromP' (trans (trans f z) p)
+                                                       qq= trans t (trans d (trans s r))
+                                                   in rewrite sym q
+                                                   in Fork x (Fork o u i d s t r) k z (two_to_min w p) f qq
+                                         Right p => let (Fork o u i d s t r) = insert x e
+                                                        q = maxFromP' (trans p (trans w g))
+                                                        qq= trans t (trans d (trans s r))
+                                                    in rewrite sym (maxKom e b)
+                                                    in rewrite sym q
+                                                    in Fork (Fork o u i d s t r) y k (two_to_max z p) w qq g
+
+list_to_tree : List Nat -> (a : Nat ** b : Nat ** STree a b)
+list_to_tree [] = (0 ** 0 ** Empt)
+list_to_tree (x :: xs) = let (a ** b ** t) = list_to_tree xs 
+                             t' = insert t x
+                             in (mmin a x ** mmax b x ** t')
+                             
+                             
+tree_to_list : STree a b -> List Nat
+tree_to_list Empt = []
+tree_to_list (Fork x y e z w s t) = tree_to_list x ++ [e] ++ tree_to_list y
+
+
+sort : List Nat -> List Nat
+sort l = let (a ** b ** t) = list_to_tree l
+         in tree_to_list t
