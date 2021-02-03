@@ -9,11 +9,21 @@ data IsRev : Vect n a -> Vect n a -> Type where
   Empty : IsRev [] []
   AddElement : (x : a) -> IsRev xs ys -> IsRev (x::xs) (snoc ys x)
 
+rev' : Vect n a -> Vect n a
+rev' [] = []
+rev' (x :: xs) = snoc (rev' xs) x
 
+rev : (xs : Vect n a) -> (ys : Vect n a ** p : IsRev xs ys ** rev' xs = ys)
+rev [] = ([] ** Empty ** Refl)
+rev (x :: xs) = 
+  let (ys ** p ** q) = rev xs 
+  in (snoc ys x ** AddElement x p ** cong {f = \a => snoc a x} q)
 
-rev : (xs : Vect n a) -> (ys : Vect n a ** IsRev xs ys)
-rev [] = ([] ** Empty)
-rev (x :: xs) = let (ys ** p) = rev xs in (snoc ys x ** AddElement x p)
+isRev_to_eq : IsRev xs ys -> rev' xs = ys
+isRev_to_eq Empty = Refl
+isRev_to_eq (AddElement x y) = 
+  let p = isRev_to_eq y
+  in cong {f = \a => snoc a x} p
 
 lem : (xs : Vect n a)
       ->(ys : Vect n a)
