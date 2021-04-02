@@ -42,4 +42,14 @@ to_list_correct_2 (Op x y) = let p_1 = to_list_correct_2 x
                              in Refl
 
 
-
+m_reflect : (e : Exp) -> 
+       (f : Exp) -> 
+       interprete_list (to_list e) = interprete_list (to_list f) ->
+       interprete e = interprete f
+m_reflect e f p = 
+  let q_1 = to_list_correct_2 e 
+      q_2 = to_list_correct_2 f
+  in rewrite q_1
+  in rewrite q_2
+  in p
+     
