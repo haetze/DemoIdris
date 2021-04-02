@@ -53,3 +53,40 @@ m_reflect e f p =
   in rewrite q_2
   in p
      
+-- reify : (me : Nat) -> Exp
+-- Coq uses LTac to implement it. 
+-- This allows them to match on expression which are parts of a Type.
+{-
+ Ltac reify me := 
+   match me with
+   | e ⇒ Ident
+   | ?me1 + ?me2 ⇒
+     let r1 := reify me1 in 
+     let r2 := reify me2 in constr:(Op r1 r2)
+   | _ ⇒ constr:(Var me) end.
+   
+ Ltac monoid := 
+   match goal with
+   | [⊢?me1 =?me2] ⇒ 
+     let r1 := reify me1 in 
+     let r2 := reify me2 in
+     change (mdenote r1 = mdenote r2); 
+     apply monoid reflect; simpl
+   end.
+-}
+-- They get away with this because 
+--   1. LTac is untyped 
+--   2. They don't have to be total
+-- (They are related.)
+-- We would need to do match on the structure on Nat.
+-- reify : (me : Nat) -> Exp
+-- reify 0 = Ident
+-- reify (a + b) = Op (reify a) (reify b)
+-- reify n = Vr n
+-- We can't. 
+-- (a + b) is not a constructor. 
+-- And a view means we need to calculate it, but we want to match on a term in a type.
+
+
+
+
