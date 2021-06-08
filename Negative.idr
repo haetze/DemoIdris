@@ -1,9 +1,9 @@
 module Negative
 
-data T : Nat -> Type where
-  C : T a
-  X : (a : T x) -> (f : T x -> Nat) -> T (S (f a))
+data T : Type where
+  C : T
+  X : (a : T) -> (f : T -> Nat) -> T
 --                         ^
 --                  Is neither positive nor half-positive
 --             https://en.wikipedia.org/wiki/Induction-recursion                         
-
+-- 
